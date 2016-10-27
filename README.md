@@ -18,18 +18,18 @@ Chaos framework for testing Minio's fault tolerance capability.
 
 - Fetch the project 
 
-  `$go get github.com/hackintoshrao/minio-chaos` 
+  `$go get github.com/minio/chaos` 
 - Build master program.
 
-  `$ cd $GOPATH/src/github.com/hackintoshrao/minio-chaos/master && go build`
+  `$ cd $GOPATH/src/github.com/minio/chaos/master && go build`
 - Run Minio Distributed server using systemd script on remote nodes. 
   The workers use `systemd` to control the Minio process. [Click here](https://github.com/minio/minio/tree/master/dist/linux-systemd/distributed) for info on configuring systemd to run Minio Distributed.
 - Build and run chaos-workers on each these remote nodes. Use `sudo` to run worker. 
   Need privilaged access to control Minio process using systemd.
   
-  `$ go get github.com/hackintoshrao/minio-chaos`
+  `$ go get github.com/minio/chaos`
   
-  `$ cd $GOPATH/src/github.com/hackintoshrao/minio-chaos/worker/ && go build`
+  `$ cd $GOPATH/src/github.com/minio/chaos/worker/ && go build`
   
   `$ sudo ./worker`
 - Run master. 
