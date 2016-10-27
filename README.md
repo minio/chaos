@@ -34,7 +34,7 @@ $ sudo ./worker
 - Run master. 
 
 ```sh
-$ master -endpoints="<Node-1-IP>:9997,<NODE-2-IP>:9997,<NODE-3-IP>:9997...... -recover=30"
+$ master -endpoints="<Node-1-IP>:9997,<NODE-2-IP>:9997,<NODE-3-IP>:9997...... -recover=30 -rounds=10"
 ```
 
 Chaos workers will be running at port "9997" now.   
@@ -50,6 +50,9 @@ Chaos workers will be running at port "9997" now.
 -endpoints: "," separted <IP>:<PORT> at which Remote Chaos Workers are Running".
 ```
 
+```
+-rounds: Number of rounds the chaos test has to be run.
+```
 
 # TODO
 
