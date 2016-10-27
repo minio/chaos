@@ -31,6 +31,7 @@ func main() {
 	// TODO: parse all the flags here.
 	endPointStr := flag.String("endpoints", "", "RPC endpoints of workers.")
 	recoverStr := flag.String("recover", "10", "Recovery time of the remote node after Choas.")
+	roundsStr := flag.String("rounds", "1", "Number of rounds the Choas test has to be run.")
 	// parse the command line flags.
 	flag.Parse()
 	endPoints := strings.Split(*endPointStr, ",")
@@ -51,7 +52,16 @@ func main() {
 		chaosWorkers[i] = &worker
 	}
 
+	// parse the interger value of the recovery string.
+	// log and exit in case of an invalid value.
 	recoveryTime, err := strconv.Atoi(*recoverStr)
+	if err != nil {
+		log.Fatalf("Please enter valid time string for recovery: ", err)
+	}
+
+	// parse the interger value of the rounds string.
+	// log and exit in case of an invalid value.
+	rounds, err := strconv.Atoi(*roundsStr)
 	if err != nil {
 		log.Fatalf("Please enter valid time string for recovery: ", err)
 	}
@@ -73,8 +83,14 @@ func main() {
 	// `RoundRobinChaos` satisfies the `Chaos` interface and it Fails the nodes and recovers them
 	// one after another in round robin fashion.
 	roundRobinChaos := &RoundRobinChaos{}
-	err = chaosTest.UnleashChaos(roundRobinChaos)
-	if err != nil {
-		log.Fatal("Chaos test failed with error: ", err)
+	// Run the test for specified number of rounds.
+	for j := 0; j < rounds; j++ {
+		log.Println("Starting Chaos test... Round ", j+1)
+		// Unleash the chaos test.
+		err = chaosTest.UnleashChaos(roundRobinChaos)
+		// log and exit in case of error.
+		if err != nil {
+			log.Fatal("Chaos test failed with error: ", err)
+		}
 	}
 }
