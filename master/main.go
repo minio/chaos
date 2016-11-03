@@ -23,19 +23,37 @@ import (
 	"strings"
 )
 
-const (
-	MinioDefaultAddr = "http://127.0.0.1:9000"
-)
+// verify whether the Minio server port is a valid integer.
+func verifyMinioPort(portStr string) error {
+	_, err := strconv.Atoi(portStr)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
 func main() {
 	// TODO: parse all the flags here.
 	endPointStr := flag.String("endpoints", "", "RPC endpoints of workers.")
 	recoverStr := flag.String("recover", "10", "Recovery time of the remote node after Choas.")
 	roundsStr := flag.String("rounds", "1", "Number of rounds the Choas test has to be run.")
+	// Port at which Minio server is run on remote nodes.
+	// Default Minio server port of 9000 is taken as the default option.
+	minioPortStr := flag.String("minio-port", "9000", "Port at which Minio server is run on remote nodes.")
 	// parse the command line flags.
 	flag.Parse()
+	// obtain all the node end points.
 	endPoints := strings.Split(*endPointStr, ",")
+	// verify whether a valid integer port is given.
+	if err := verifyMinioPort(*minioPortStr); err != nil {
+		log.Fatalf("Please enter a valid integer port at which Minio server is running on remote nodes.")
+	}
 
+	// minioAddr - will be used by workers on the respective remote nodes to verify whether Minio is running as a service
+	// before the chaos test is started.
+	minioAddr := "http://127.0.0.1:" + *minioPortStr
+	// Allocate memory for ChaosWorkers.
+	// Allocating one for each node.
 	chaosWorkers := make([]*ChaosWorker, len(endPoints))
 
 	// Iterate through the endPoints and create `ChaosTest` instance.
@@ -43,7 +61,7 @@ func main() {
 		worker := ChaosWorker{
 			WorkerEndpoint: endPoint,
 			Node: MinioNode{
-				Addr: MinioDefaultAddr,
+				Addr: minioAddr,
 			},
 			//TODO: Make use of report Dir.
 			ReportDir: "/not-used-yet",
