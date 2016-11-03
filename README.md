@@ -34,7 +34,7 @@ $ sudo ./worker
 - Run master. 
 
 ```sh
-$ master -endpoints="<Node-1-IP>:9997,<NODE-2-IP>:9997,<NODE-3-IP>:9997...... -recover=30 -rounds=10"
+$ master -endpoints="<Node-1-IP>:9997,<NODE-2-IP>:9997,<NODE-3-IP>:9997...... -recover=30 -rounds=10 -minio-port=9199"
 ```
 
 Chaos workers will be running at port "9997" now.   
@@ -46,12 +46,16 @@ Chaos workers will be running at port "9997" now.
 -recover : Removery time after the failure injection on remote Minio node.
 ```
 
-```
+```sh
 -endpoints: "," separted <IP>:<PORT> at which Remote Chaos Workers are Running".
 ```
 
-```
+```sh
 -rounds: Number of rounds the chaos test has to be run.
+```
+
+```sh
+-minio-port: Port at which Minio server is running on remote node. Port 9000 is taken as the default value if no value is provided. 
 ```
 
 # TODO
