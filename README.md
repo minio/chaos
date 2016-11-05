@@ -22,7 +22,7 @@ $ go get -d github.com/minio/chaos`
 $ cd $GOPATH/src/github.com/minio/chaos/master && go build
 ```
 
-- Run Minio Distributed server using systemd script on remote nodes. The workers use `systemd` to control the Minio process. [Click here](https://github.com/minio/minio/tree/master/dist/linux-systemd/distributed) for info on configuring systemd to run Minio Distributed.
+- Run Minio Distributed server using systemd script on remote nodes. The workers use `systemd` to control the Minio process. [Click here](https://github.com/minio/minio-systemd/tree/master/distributed) for info on configuring systemd to run Minio Distributed.
 - Build and run chaos-workers on each these remote nodes. Use `sudo` to run worker. Need privilaged access to control Minio process using systemd.
   
 ```sh
