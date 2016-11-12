@@ -51,17 +51,29 @@ func IsMinioRunning(addr string) error {
 	return nil
 }
 
-// Starts the Minio server using `systemd` when master call it over RPC/
-func (w *Worker) StartMinioServer(args *string, reply *struct{}) error {
+// StartMinio - Start Minio server using using `systemd` command.
+func StartMinio() error {
+	// Start minio server using `service minio start`.
 	cmd := exec.Command("service", "minio", "start")
-
 	err := cmd.Start()
 	if err != nil {
+		// In case of an error log and return.
 		log.Println("Failed to Start the Minio Server using the systemd script: <ERROR> ", err)
 		return err
 	}
-	log.Println("Started Minio server using `service minio stop`.")
+	// Wait till the command is executed.
 	cmd.Wait()
+	log.Println("Started Minio server using `service minio start`")
+	return nil
+}
+
+// Starts the Minio server using `systemd` when master call it over RPC.
+func (w *Worker) StartMinioServer(args *string, reply *struct{}) error {
+	// Start Minio using the systemd command.
+	err := StartMinio()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -82,9 +94,14 @@ func (w *Worker) StopMinioServer(args *string, reply *struct{}) error {
 // Initialize the worker for the chaos test.
 // A `nil` error response indicates the master that the worker and Minio server is running on the specified port.
 func (w *Worker) InitChaosWorker(args *string, reply *struct{}) error {
+	// Start Minio server.
+	err := StartMinio()
+	if err != nil {
+		return err
+	}
 	log.Println("Initializing the Node for the Chaos test.")
 	// Verifies whether Minio is running on the specified port.
-	err := IsMinioRunning(*args)
+	err = IsMinioRunning(*args)
 	if err != nil {
 		return err
 	}
