@@ -23,6 +23,8 @@ import (
 	"net/rpc"
 	"os/exec"
 	"strings"
+
+	"github.com/minio/chaos/shared"
 )
 
 type Worker struct {
@@ -92,16 +94,23 @@ func (w *Worker) StopMinioServer(args *string, reply *struct{}) error {
 }
 
 // Initialize the worker for the chaos test.
+// Starts the Minio server is master is ran with `-start-minio` argument.
+// And then verify whether starting Minio was succesfull.
+// If not just verify whether minio server is running.
 // A `nil` error response indicates the master that the worker and Minio server is running on the specified port.
-func (w *Worker) InitChaosWorker(args *string, reply *struct{}) error {
-	// Start Minio server.
-	err := StartMinio()
-	if err != nil {
-		return err
+func (w *Worker) InitChaosWorker(args *shared.MinioNode, reply *struct{}) error {
+	// Start Minio server if `-start-minio` flag is enabled.
+	if args.StartMinio {
+		// Start Minio server.
+		err := StartMinio()
+		// return error for the RPC call.
+		if err != nil {
+			return err
+		}
 	}
 	log.Println("Initializing the Node for the Chaos test.")
 	// Verifies whether Minio is running on the specified port.
-	err = IsMinioRunning(*args)
+	err := IsMinioRunning(args.Addr)
 	if err != nil {
 		return err
 	}
@@ -120,5 +129,7 @@ func main() {
 	// Regsitering the RPC service.
 	mux.Handle("/", rpcServer)
 	// Run the server.
+	// TODO: Log message on start.
+	// TODO: Return error to master on failure to run on port 9997.
 	http.ListenAndServe(":9997", mux)
 }

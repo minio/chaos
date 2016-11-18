@@ -21,6 +21,8 @@ import (
 	"log"
 	"strconv"
 	"strings"
+
+	"github.com/minio/chaos/shared"
 )
 
 // verify whether the Minio server port is a valid integer.
@@ -37,6 +39,8 @@ func main() {
 	endPointStr := flag.String("endpoints", "", "RPC endpoints of workers.")
 	recoverStr := flag.String("recover", "10", "Recovery time of the remote node after Choas.")
 	roundsStr := flag.String("rounds", "1", "Number of rounds the Choas test has to be run.")
+	startMinioPtr := flag.Bool("start-minio", false, "flag indicating whether Minio has to be started on remote nodes.")
+
 	// Port at which Minio server is run on remote nodes.
 	// Default Minio server port of 9000 is taken as the default option.
 	minioPortStr := flag.String("minio-port", "9000", "Port at which Minio server is run on remote nodes.")
@@ -60,8 +64,9 @@ func main() {
 	for i, endPoint := range endPoints {
 		worker := ChaosWorker{
 			WorkerEndpoint: endPoint,
-			Node: MinioNode{
-				Addr: minioAddr,
+			Node: shared.MinioNode{
+				Addr:       minioAddr,
+				StartMinio: *startMinioPtr,
 			},
 			//TODO: Make use of report Dir.
 			ReportDir: "/not-used-yet",

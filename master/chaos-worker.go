@@ -19,6 +19,8 @@ package main
 import (
 	"fmt"
 	"net/rpc"
+
+	"github.com/minio/chaos/shared"
 )
 
 // workerConfig contains info about the chaos workers running on nodes to be tested for fault tolerance.
@@ -27,7 +29,7 @@ type ChaosWorker struct {
 	// Endpoint of the chaos worker.
 	WorkerEndpoint string
 	// Info of the Minio Server Instance running on the node of the chaos worker.
-	Node MinioNode
+	Node shared.MinioNode
 	// RPC client for communicating the worker.
 	Client *rpc.Client
 	// Directory in which the chaos worker dumps the report.
@@ -45,8 +47,7 @@ func (chaos ChaosWorker) InitChaos() (*rpc.Client, error) {
 	if err != nil {
 		return nil, fmt.Errorf("%s <Note> Make sure that the worker is running at %s", err.Error(), chaos.WorkerEndpoint)
 	}
-	minioRemoteAddr := chaos.Node.Addr
-	args := &minioRemoteAddr
+	args := &chaos.Node
 	reply := struct{}{}
 	// Call the `InitChaosWorker` RPC method on the remote worker.
 	// The worker verifies if the Minio server is running on the specified port on the remote node.
