@@ -58,6 +58,9 @@ Chaos workers will be running at port "9997" now.
 -minio-port: Port at which Minio server is running on remote node. Port 9000 is taken as the default value if no value is provided. 
 ```
 
+```sh
+-start-minio: Starts Minio server on remote nodes during initialization of the chaos test. 
+```
 # TODO
 
 - By Extending the `Chaos` interface different failures can be introduced. Next step is to make it more easier to run, with more options and different failures like multiple node failures will introduced.

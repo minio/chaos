@@ -14,9 +14,17 @@
  * limitations under the License.
  */
 
-package main
+// Package  containing shared data structure between master and the workers.
+package shared
 
 // MinioNode - info of the Minio node under chaos test.
 type MinioNode struct {
+	// flag indicating whether Minio node has to started.
+	// unless specifed with a `-start` flag an attempt to start Minio server
+	// on the remote node is done.`
+	StartMinio bool
+	// Adress of format 127.0.0.1:<PORT>,
+	// Used to validate whether Minio server is running on each of the nodes
+	// in the specified port.
 	Addr string
 }
