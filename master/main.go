@@ -115,5 +115,13 @@ func main() {
 		if err != nil {
 			log.Fatal("Chaos test failed with error: ", err)
 		}
+		log.Println("Round %d ", j+1, " test complete, verifying health of the nodes.")
+		// Verify health of the nodes after each round of test.
+		// Abort in case in any of the nodes failed to restart during chaos test.
+		nodesDown := chaosTest.CheckNodeHealth()
+		if nodesDown {
+			log.Fatal("One or more nodes failed to restart, aborting chaos test")
+		}
+		log.Println("All nodes are up.")
 	}
 }

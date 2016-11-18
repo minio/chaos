@@ -60,6 +60,20 @@ func (chaos ChaosWorker) InitChaos() (*rpc.Client, error) {
 	return client, nil
 }
 
+func (chaos ChaosWorker) CheckMinioHealth() error {
+	args := &chaos.Node.Addr
+	reply := struct{}{}
+	// Call the `InitChaosWorker` RPC method on the remote worker.
+	// The worker verifies if the Minio server is running on the specified port on the remote node.
+	err := chaos.Client.Call("ChaosWorker.CheckMinioHealth", args, &reply)
+	// return in case of error.
+	if err != nil {
+		return err
+	}
+	// Health of Minio server on the remote node is fine.
+	return nil
+}
+
 // ReportStatus - Obtain the Status of the Minio node and choas-worker using the RPC call.
 func (chaos ChaosWorker) ReportStatus() {
 

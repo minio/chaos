@@ -30,6 +30,30 @@ func (chaos *ChaosTest) InitChaosWorker(args *string, reply *int) error {
 	return nil
 }
 
+func (chaos *ChaosTest) CheckNodeHealth() bool {
+
+	var errorOccured bool
+	// Iterate through all the chaos workers on remote nodes.
+	// Check health status of each Minio node.
+	// Don't stop the process if any of the workers return error on RPC call.
+	// Log all the errors.
+	// Health of the node has to be checked after each round of chaos test.
+	// This ensures that any failure of the node during chaos test doesn't go unnoticed.
+	for _, worker := range chaos.ChaosWorkers {
+		// Verify the health of Minio server on the remote node.
+		err := worker.CheckMinioHealth()
+		// don't return in the event of an error.
+		// log the errors from all nodes before returning.
+		if err != nil {
+			// flag that an error occured in the remote node.
+			errorOccured = true
+			// log the error.
+			log.Printf("Minio health check on Node %s failed: <ERROR> %v.", worker.WorkerEndpoint, err)
+		}
+	}
+	return errorOccured
+}
+
 // Ping all the workers via net/rpc, make sure they are reachable and running,
 // these workers on the nodes will also make sure Minio servers too are running on these nodes,
 // In the event of any chaos worker not reachable or Minio server not running on these nodes it'll return error
@@ -57,8 +81,9 @@ func (chaos *ChaosTest) InitChaosTest() bool {
 			// log the error.
 			log.Printf("Error from Node %s: <ERROR> %v.", worker.WorkerEndpoint, err)
 		}
+		// No error, add the RPC client to be used for further communication
+		// with the workers on the remote node.
 		worker.Client = rpcClient
-
 	}
 	return errorOccured
 }
