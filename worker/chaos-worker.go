@@ -43,6 +43,7 @@ func IsMinioRunning(addr string) error {
 		log.Println(err)
 		return errRunMinioServer
 	}
+	defer resp.Body.Close()
 	log.Println(resp.Header.Get("Server"))
 	// check if the server running is Minio server.
 	// this is done by checking for string `Minio` is the `Server` header of the response.
