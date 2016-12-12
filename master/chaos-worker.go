@@ -19,6 +19,7 @@ package main
 import (
 	"fmt"
 	"net/rpc"
+	"time"
 
 	"github.com/minio/chaos/shared"
 )
@@ -60,18 +61,29 @@ func (chaos ChaosWorker) InitChaos() (*rpc.Client, error) {
 	return client, nil
 }
 
+const (
+	reattempts     = 5
+	reattemptDelay = 3
+)
+
 func (chaos ChaosWorker) CheckMinioHealth() error {
+	var err error
 	args := &chaos.Node.Addr
 	reply := struct{}{}
 	// Call the `InitChaosWorker` RPC method on the remote worker.
 	// The worker verifies if the Minio server is running on the specified port on the remote node.
-	err := chaos.Client.Call("ChaosWorker.CheckMinioHealth", args, &reply)
-	// return in case of error.
-	if err != nil {
-		return err
+	for i := 0; i < reattempts; i++ {
+		err := chaos.Client.Call("ChaosWorker.CheckMinioHealth", args, &reply)
+		// return in case of error.
+		if err == nil {
+			// Health of Minio server on the remote node is fine.
+			return nil
+		}
+		// if the health check fails reatttempt the check after the `reattemptDelay` seconds.
+		time.Sleep(reattemptDelay * time.Second)
 	}
-	// Health of Minio server on the remote node is fine.
-	return nil
+	// Failed even after the reattmpts.
+	return err
 }
 
 // ReportStatus - Obtain the Status of the Minio node and choas-worker using the RPC call.

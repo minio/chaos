@@ -96,7 +96,6 @@ func (w *Worker) StopMinioServer(args *string, reply *struct{}) error {
 
 // Check whether Minio server is up.
 func (w *Worker) CheckMinioHealth(args *string, reply *struct{}) error {
-	log.Println("Initializing the Node for the Chaos test.")
 	// Verifies whether Minio is running on the specified port.
 	err := IsMinioRunning(*args)
 	if err != nil {
