@@ -1,0 +1,42 @@
+version: '2'
+
+# starts 4 docker containers running minio server instances. Each
+# minio server's web interface will be accessible on the host at port
+# 9001 through 9004.
+services:
+  minio1:
+    build: . 
+    ports:
+      - "9010:9000"
+      - "9014:9997"
+    volumes:
+      - ./logs/minio1:/var/log/minio    
+    cap_add:
+      - SYS_ADMIN
+  minio2:
+    build: . 
+    ports:
+      - "9011:9000"
+      - "9015:9997"
+    volumes:
+      - ./logs/minio2:/var/log/minio    
+    cap_add:
+      - SYS_ADMIN
+  minio3:
+    build: . 
+    ports:
+      - "9012:9000"
+      - "9016:9997"
+    volumes:
+      - ./logs/minio3:/var/log/minio    
+    cap_add:
+      - SYS_ADMIN
+  minio4:
+    build: . 
+    ports:
+      - "9013:9000"
+      - "9017:9997"
+    volumes:
+      - ./logs/minio4:/var/log/minio    
+    cap_add:
+      - SYS_ADMIN

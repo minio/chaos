@@ -20,8 +20,6 @@ import (
 	"fmt"
 	"net/rpc"
 	"time"
-
-	"github.com/minio/chaos/shared"
 )
 
 // workerConfig contains info about the chaos workers running on nodes to be tested for fault tolerance.
@@ -29,8 +27,6 @@ import (
 type ChaosWorker struct {
 	// Endpoint of the chaos worker.
 	WorkerEndpoint string
-	// Info of the Minio Server Instance running on the node of the chaos worker.
-	Node shared.MinioNode
 	// RPC client for communicating the worker.
 	Client *rpc.Client
 	// Directory in which the chaos worker dumps the report.
@@ -48,7 +44,7 @@ func (chaos ChaosWorker) InitChaos() (*rpc.Client, error) {
 	if err != nil {
 		return nil, fmt.Errorf("%s <Note> Make sure that the worker is running at %s", err.Error(), chaos.WorkerEndpoint)
 	}
-	args := &chaos.Node
+	args := struct{}{}
 	reply := struct{}{}
 	// Call the `InitChaosWorker` RPC method on the remote worker.
 	// The worker verifies if the Minio server is running on the specified port on the remote node.
@@ -68,12 +64,12 @@ const (
 
 func (chaos ChaosWorker) CheckMinioHealth() error {
 	var err error
-	args := &chaos.Node.Addr
+	args := struct{}{}
 	reply := struct{}{}
 	// Call the `InitChaosWorker` RPC method on the remote worker.
 	// The worker verifies if the Minio server is running on the specified port on the remote node.
 	for i := 0; i < reattempts; i++ {
-		err := chaos.Client.Call("ChaosWorker.CheckMinioHealth", args, &reply)
+		err := chaos.Client.Call("ChaosWorker.CheckMinioHealth", &args, &reply)
 		// return in case of error.
 		if err == nil {
 			// Health of Minio server on the remote node is fine.

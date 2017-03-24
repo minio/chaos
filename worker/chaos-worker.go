@@ -23,8 +23,6 @@ import (
 	"net/rpc"
 	"os/exec"
 	"strings"
-
-	"github.com/minio/chaos/shared"
 )
 
 type Worker struct {
@@ -43,8 +41,8 @@ func IsMinioRunning(addr string) error {
 		log.Println(err)
 		return errRunMinioServer
 	}
-	defer resp.Body.Close()
 	log.Println(resp.Header.Get("Server"))
+	defer resp.Body.Close()
 	// check if the server running is Minio server.
 	// this is done by checking for string `Minio` is the `Server` header of the response.
 	if !strings.Contains(resp.Header.Get("Server"), "Minio") {
@@ -54,25 +52,25 @@ func IsMinioRunning(addr string) error {
 	return nil
 }
 
-// StartMinio - Start Minio server using using `systemd` command.
+// StartMinio - Start Minio server using using `supervisord` command.
 func StartMinio() error {
 	// Start minio server using `service minio start`.
-	cmd := exec.Command("service", "minio", "start")
+	cmd := exec.Command("supervisorctl", "start", "minio")
 	err := cmd.Start()
 	if err != nil {
 		// In case of an error log and return.
-		log.Println("Failed to Start the Minio Server using the systemd script: <ERROR> ", err)
+		log.Println("Failed to Start the Minio Server using supervisord: <ERROR> ", err)
 		return err
 	}
 	// Wait till the command is executed.
 	cmd.Wait()
-	log.Println("Started Minio server using `service minio start`")
+	log.Println("Started Minio server using `supervisorctl minio start`")
 	return nil
 }
 
-// Starts the Minio server using `systemd` when master call it over RPC.
-func (w *Worker) StartMinioServer(args *string, reply *struct{}) error {
-	// Start Minio using the systemd command.
+// Starts the Minio server using `supervisord` when master call it over RPC.
+func (w *Worker) StartMinioServer(args *struct{}, reply *struct{}) error {
+	// Start Minio using the supervisorctl command.
 	err := StartMinio()
 	if err != nil {
 		return err
@@ -80,24 +78,27 @@ func (w *Worker) StartMinioServer(args *string, reply *struct{}) error {
 	return nil
 }
 
-// Stops the Minio server using `systemd` when master call it over RPC/
-func (w *Worker) StopMinioServer(args *string, reply *struct{}) error {
-	cmd := exec.Command("service", "minio", "stop")
+// Stops the Minio server using `supervisord` when master call it over RPC/
+func (w *Worker) StopMinioServer(args *struct{}, reply *struct{}) error {
+	cmd := exec.Command("/usr/local/bin/supervisorctl", "stop", "minio")
 
 	err := cmd.Start()
 	if err != nil {
-		log.Println("Failed to Stop the Minio Server using the systemd script: <ERROR> ", err)
+		log.Println("Failed to Stop the Minio Server using supervisord: <ERROR> ", err)
 		return err
 	}
-	log.Println("Stopped Minio server using `service minio stop`.")
 	cmd.Wait()
+	log.Println("Stopped Minio server using `supervisorctl stop minio`.")
 	return nil
 }
 
 // Check whether Minio server is up.
-func (w *Worker) CheckMinioHealth(args *string, reply *struct{}) error {
+func (w *Worker) CheckMinioHealth(args *struct{}, reply *struct{}) error {
+	// Minio runs on port 9000 in the container.
+	addr := "http://127.0.0.1:9000"
+
 	// Verifies whether Minio is running on the specified port.
-	err := IsMinioRunning(*args)
+	err := IsMinioRunning(addr)
 	if err != nil {
 		return err
 	}
@@ -109,19 +110,12 @@ func (w *Worker) CheckMinioHealth(args *string, reply *struct{}) error {
 // And then verify whether starting Minio was succesfull.
 // If not just verify whether minio server is running.
 // A `nil` error response indicates the master that the worker and Minio server is running on the specified port.
-func (w *Worker) InitChaosWorker(args *shared.MinioNode, reply *struct{}) error {
-	// Start Minio server if `-start-minio` flag is enabled.
-	if args.StartMinio {
-		// Start Minio server.
-		err := StartMinio()
-		// return error for the RPC call.
-		if err != nil {
-			return err
-		}
-	}
+func (w *Worker) InitChaosWorker(args *struct{}, reply *struct{}) error {
 	log.Println("Initializing the Node for the Chaos test.")
 	// Verifies whether Minio is running on the specified port.
-	err := IsMinioRunning(args.Addr)
+	addr := "http://127.0.0.1:9000"
+
+	err := IsMinioRunning(addr)
 	if err != nil {
 		return err
 	}
