@@ -95,10 +95,8 @@ func (w *Worker) StopMinioServer(args *struct{}, reply *struct{}) error {
 // Check whether Minio server is up.
 func (w *Worker) CheckMinioHealth(args *struct{}, reply *struct{}) error {
 	// Minio runs on port 9000 in the container.
-	addr := "http://127.0.0.1:9000"
-
 	// Verifies whether Minio is running on the specified port.
-	err := IsMinioRunning(addr)
+	err := IsMinioRunning("http://127.0.0.1:9000")
 	if err != nil {
 		return err
 	}
@@ -113,9 +111,7 @@ func (w *Worker) CheckMinioHealth(args *struct{}, reply *struct{}) error {
 func (w *Worker) InitChaosWorker(args *struct{}, reply *struct{}) error {
 	log.Println("Initializing the Node for the Chaos test.")
 	// Verifies whether Minio is running on the specified port.
-	addr := "http://127.0.0.1:9000"
-
-	err := IsMinioRunning(addr)
+	err := IsMinioRunning("http://127.0.0.1:9000")
 	if err != nil {
 		return err
 	}

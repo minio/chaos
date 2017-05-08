@@ -12,9 +12,7 @@ RUN \
        # install pip, required for installing supervisord.
        apt-get -y --assume-yes install python-pip && \
        # install supervisord.
-       pip install supervisor
-
-RUN \
+       pip install supervisor && \
        # Fetch and build  Minio server.
        go get -u github.com/minio/minio && \
        # Build worker from the local changes.

@@ -96,7 +96,7 @@ Using chaos for `mc admin heal` testing.
   $ docker-compose exec minio4 supervisorctl stop minio
   ```
 
-- Uplaod a file from host.
+- Upload a file from host.
   ```sh
   $ mc config host add minio4 http://127.0.0.1:9013 minio123 minio12345
   $ mc mb minio4/test-bucket/
