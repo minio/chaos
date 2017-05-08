@@ -1,0 +1,108 @@
+{
+	"version": "18",
+	"credential": {
+		"accessKey": "minio123",
+		"secretKey": "minio12345"
+	},
+	"region": "us-east-1",
+	"browser": "on",
+	"logger": {
+		"console": {
+			"enable": false,
+			"level": "error"
+			
+		},
+		"file": {
+			"enable": true,
+			"filename": "/var/log/minio/minio.log"
+		}
+	},
+	"notify": {
+		"amqp": {
+			"1": {
+				"enable": false,
+				"url": "",
+				"exchange": "",
+				"routingKey": "",
+				"exchangeType": "",
+				"mandatory": false,
+				"immediate": false,
+				"durable": false,
+				"internal": false,
+				"noWait": false,
+				"autoDeleted": false
+			}
+		},
+		"nats": {
+			"1": {
+				"enable": false,
+				"address": "",
+				"subject": "",
+				"username": "",
+				"password": "",
+				"token": "",
+				"secure": false,
+				"pingInterval": 0,
+				"streaming": {
+					"enable": false,
+					"clusterID": "",
+					"clientID": "",
+					"async": false,
+					"maxPubAcksInflight": 0
+				}
+			}
+		},
+		"elasticsearch": {
+			"1": {
+				"enable": false,
+				"url": "",
+				"index": ""
+			}
+		},
+		"redis": {
+			"1": {
+				"enable": false,
+				"address": "",
+				"password": "",
+				"key": ""
+			}
+		},
+		"postgresql": {
+			"1": {
+				"enable": false,
+				"connectionString": "",
+				"table": "",
+				"host": "",
+				"port": "",
+				"user": "",
+				"password": "",
+				"database": ""
+			}
+		},
+		"kafka": {
+			"1": {
+				"enable": false,
+				"brokers": null,
+				"topic": ""
+			}
+		},
+		"webhook": {
+			"1": {
+				"enable": false,
+				"endpoint": ""
+			}
+		},
+		"mysql": {
+			"1": {
+				"enable": false,
+				"dsnString": "",
+				"table": "",
+				"host": "",
+				"port": "",
+				"user": "",
+				"password": "",
+				"database": ""
+			}
+		}
+	}
+}

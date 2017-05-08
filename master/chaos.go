@@ -41,16 +41,13 @@ type GenericFail struct {
 
 func (fail GenericFail) Fail(c ChaosWorker) error {
 	var err error
-	// Address containing info of the port at which Minio has to be run
-	// on the remote node of the worker.
-	minioRemoteAddr := c.Node.Addr
-	args := &minioRemoteAddr
+	args := struct{}{}
 	// expecting only error response from the RPC call.
 	// not relying on the reply.
 	reply := struct{}{}
 	// Stop the Minio server on the remote node.
 	log.Println("Attempting to stop Minio server on node: ", c.WorkerEndpoint)
-	err = c.Client.Call("ChaosWorker.StopMinioServer", args, &reply)
+	err = c.Client.Call("ChaosWorker.StopMinioServer", &args, &reply)
 	if err == nil {
 		log.Println("Minio server stopped on node: ", c.WorkerEndpoint)
 	}
@@ -62,17 +59,14 @@ func (fail GenericFail) Fail(c ChaosWorker) error {
 // Used to used to recover after the `Fail` method is called.
 func (fail GenericFail) Recover(c ChaosWorker) error {
 	var err error
-	// Address containing info of the port at which Minio has to be run
-	// on the remote node of the worker.
-	minioRemoteAddr := c.Node.Addr
-	args := &minioRemoteAddr
+	args := struct{}{}
 	// expecting only error response from the RPC call.
 	// not relying on the reply.
 	reply := struct{}{}
 
 	log.Println("Attempting to Start Minio server on node: ", c.WorkerEndpoint)
 	// start the Minio server on the remote node.
-	err = c.Client.Call("ChaosWorker.StartMinioServer", args, &reply)
+	err = c.Client.Call("ChaosWorker.StartMinioServer", &args, &reply)
 	// Successfully started Minio server on the remote node,
 	// log the result.
 	if err == nil {
